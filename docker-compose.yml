@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - my_network
+
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   volumes:
+  #     - pgadmin_data:/var/lib/pgadmin
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: myemail@example.com
+  #     PGADMIN_DEFAULT_PASSWORD: mypgadminpassword
+  #   ports:
+  #     - "8080:80"
+  #   depends_on:
+  #     - db
+  #   networks:
+  #     - my_network
+
+  app:
+    build: .
+    ports:
+      - "8501:8501"
+    environment:
+      DB_HOST: db
+      DB_NAME: mydatabase
+      DB_USER: myuser
+      DB_PASS: mypassword
+    depends_on:
+      - db
+    networks:
+      - my_network
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+
+networks:
+  my_network:
+    driver: bridge
